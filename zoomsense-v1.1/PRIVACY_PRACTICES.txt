@@ -1,0 +1,135 @@
+# ZoomSense — Chrome Web Store Privacy Practices
+# Copy-paste these into the Privacy practices tab when publishing.
+# Each section maps to a required field in the Developer Dashboard.
+
+================================================================================
+SINGLE PURPOSE DESCRIPTION  (required — shown publicly on the store listing)
+================================================================================
+
+ZoomSense automatically adjusts browser tab zoom levels based on which monitor
+the Chrome window is currently displayed on, allowing different zoom levels for
+a laptop screen and an external monitor without any manual adjustment.
+
+
+================================================================================
+PERMISSION JUSTIFICATION: alarms
+================================================================================
+
+The alarms permission is used to create a repeating background poll (once per
+minute) as a fallback mechanism to detect when a Chrome window has been moved
+between monitors. Chrome does not provide a native event for window movement,
+so this alarm triggers a re-check of all window positions. In v1.1.0 this
+fallback is supplemented by a content script that detects position changes
+within 500ms, making the alarm a last-resort safety net only.
+
+
+================================================================================
+PERMISSION JUSTIFICATION: storage
+================================================================================
+
+The storage permission is used exclusively to persist the user's zoom
+preferences on their local device. Specifically, it stores:
+  • Whether the extension is enabled or disabled
+  • The ID of the display the user has designated as their external monitor
+  • The desired zoom level for the laptop display (default: 1.0×)
+  • The desired zoom level for the external monitor (default: 1.5×)
+
+No data is ever transmitted off the device. All storage uses
+chrome.storage.local — not sync storage — so data never leaves the machine.
+
+
+================================================================================
+PERMISSION JUSTIFICATION: system.display
+================================================================================
+
+The system.display permission is required to enumerate all connected monitors,
+read their screen coordinates and dimensions, and determine which physical
+display each Chrome window is currently positioned on. This is the core
+mechanism of the extension: without it, ZoomSense cannot distinguish between
+the laptop screen and an external monitor, and cannot apply the correct zoom
+level to each window.
+
+
+================================================================================
+PERMISSION JUSTIFICATION: tabs
+================================================================================
+
+The tabs permission is required to:
+  1. Read and write the zoom level of individual browser tabs via
+     chrome.tabs.getZoom() and chrome.tabs.setZoom().
+  2. Set the zoom scope to per-tab (via chrome.tabs.setZoomSettings) so that
+     zoom changes applied by ZoomSense do not affect other tabs open on the
+     same website — preserving any zoom preferences the user has set manually.
+  3. Listen to tab creation and navigation events (tabs.onCreated,
+     tabs.onUpdated, tabs.onActivated) to apply the correct zoom immediately
+     when a new tab opens or a page navigates.
+
+Tab URL data is only used transiently to skip non-zoomable tabs (e.g.
+chrome:// pages). It is never stored or transmitted.
+
+
+================================================================================
+PERMISSION JUSTIFICATION: remote code execution
+(note: ZoomSense does NOT execute remote code — use this to state that clearly)
+================================================================================
+
+ZoomSense does not execute any remote code. All JavaScript is bundled entirely
+within the extension package and loaded from the extension's own origin. The
+extension does not use eval(), new Function() with dynamic strings, or load
+scripts from any external URL. No CDNs, external APIs, or third-party services
+are contacted at any point.
+
+
+================================================================================
+DATA USAGE CERTIFICATION  (required checkbox + explanation)
+================================================================================
+
+ZoomSense does not collect, transmit, sell, or share any user data.
+
+  • No browsing history is recorded or stored.
+  • No personal information is collected.
+  • No data is sent to any server, analytics service, or third party.
+  • The only data stored is the user's zoom preferences, saved locally on
+    their device via chrome.storage.local and never leaving the device.
+
+This extension complies with the Chrome Web Store Developer Program Policies.
+The developer certifies that data usage is limited to the single stated purpose
+of adjusting zoom levels based on monitor placement.
+
+
+================================================================================
+PRIVACY POLICY URL  (required — host this publicly, e.g. GitHub Pages)
+================================================================================
+
+Suggested privacy policy text to host at a public URL
+(e.g. https://yourusername.github.io/zoomsense/privacy):
+
+---
+
+ZoomSense Privacy Policy
+Last updated: [DATE]
+
+ZoomSense is a Chrome browser extension that adjusts tab zoom levels based on
+which monitor a Chrome window is displayed on.
+
+DATA COLLECTION
+ZoomSense does not collect any personal data. It does not track browsing
+history, URLs visited, or any information about the user.
+
+LOCAL STORAGE
+ZoomSense stores the following data locally on your device only:
+- Your chosen zoom levels for laptop and external displays
+- The ID of your selected external display
+- Whether the extension is enabled or disabled
+
+This data is stored using Chrome's local storage API and never leaves your
+device.
+
+THIRD PARTIES
+ZoomSense does not share any data with third parties. It makes no network
+requests to any external server.
+
+CONTACT
+For questions, open an issue at [your GitHub repo URL].
+
+---
